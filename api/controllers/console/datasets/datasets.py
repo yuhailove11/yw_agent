@@ -56,6 +56,7 @@ from models.enums import ApiTokenType, SegmentStatus
 from models.provider_ids import ModelProviderID
 from services.api_token_service import ApiTokenCache
 from services.dataset_service import DatasetPermissionService, DatasetService, DocumentService
+from services.platform_governance.shadow_dataset_service import PlatformShadowDatasetService
 
 # Register models for flask_restx to avoid dict type issues in Swagger
 dataset_base_model = get_or_create_model("DatasetBase", dataset_fields)
@@ -306,6 +307,8 @@ class DatasetListApi(Resource):
     @enterprise_license_required
     def get(self):
         current_user, current_tenant_id = current_account_with_tenant()
+        if dify_config.PLATFORM_GOVERNANCE_ENABLED and dify_config.PLATFORM_ONLY_EXTERNAL_APPROVED_KNOWLEDGE:
+            PlatformShadowDatasetService.sync_selectable_knowledge_bases(current_tenant_id)
         # Convert query parameters to dict, handling list parameters correctly
         query_params: dict[str, str | list[str]] = dict(request.args.to_dict())
         # Handle ids and tag_ids as lists (Flask request.args.getlist returns list even for single value)
@@ -387,6 +390,8 @@ class DatasetListApi(Resource):
     @account_initialization_required
     @cloud_edition_billing_rate_limit_check("knowledge")
     def post(self):
+        if dify_config.PLATFORM_GOVERNANCE_ENABLED and dify_config.PLATFORM_DISABLE_NATIVE_DATASET_WRITE:
+            raise Forbidden("平台治理已启用，Dify 原生知识库创建已禁用，请使用已审批知识库。")
         payload = DatasetCreatePayload.model_validate(console_ns.payload or {})
         current_user, current_tenant_id = current_account_with_tenant()
 
@@ -474,6 +479,8 @@ class DatasetApi(Resource):
     @account_initialization_required
     @cloud_edition_billing_rate_limit_check("knowledge")
     def patch(self, dataset_id):
+        if dify_config.PLATFORM_GOVERNANCE_ENABLED and dify_config.PLATFORM_DISABLE_NATIVE_DATASET_WRITE:
+            raise Forbidden("平台治理已启用，Dify 原生知识库修改已禁用，请在知识库主系统处理。")
         dataset_id_str = str(dataset_id)
         dataset = DatasetService.get_dataset(dataset_id_str)
         if dataset is None:

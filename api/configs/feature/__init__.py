@@ -1093,6 +1093,37 @@ class WorkspaceConfig(BaseSettings):
     )
 
 
+class PlatformGovernanceConfig(BaseSettings):
+    """
+    统一平台治理配置。
+    """
+
+    PLATFORM_GOVERNANCE_ENABLED: bool = Field(
+        description="Enable unified platform governance integration",
+        default=False,
+    )
+
+    PLATFORM_API_BASE_URL: str = Field(
+        description="Unified platform api base url",
+        default="http://yw-platform:8088/api",
+    )
+
+    PLATFORM_API_KEY: str = Field(
+        description="Unified platform internal api key",
+        default="yw-platform-internal-key",
+    )
+
+    PLATFORM_DISABLE_NATIVE_DATASET_WRITE: bool = Field(
+        description="Disable Dify native dataset write path when governance is enabled",
+        default=True,
+    )
+
+    PLATFORM_ONLY_EXTERNAL_APPROVED_KNOWLEDGE: bool = Field(
+        description="Only allow selectable approved external knowledge bases",
+        default=True,
+    )
+
+
 class IndexingConfig(BaseSettings):
     """
     Configuration for indexing operations
@@ -1388,6 +1419,7 @@ class FeatureConfig(
     ModelLoadBalanceConfig,
     ModerationConfig,
     MultiModalTransferConfig,
+    PlatformGovernanceConfig,
     PositionConfig,
     RagEtlConfig,
     RepositoryConfig,

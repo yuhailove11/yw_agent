@@ -86,6 +86,7 @@ from models.dataset import Document as DocumentModel
 from models.enums import CreatorUserRole, DatasetQuerySource
 from services.external_knowledge_service import ExternalDatasetService
 from services.feature_service import FeatureService
+from services.platform_governance.runtime_guard import PlatformRuntimeGuard
 
 default_retrieval_model: DefaultRetrievalModelDict = {
     "search_method": RetrievalMethod.SEMANTIC_SEARCH,
@@ -1851,6 +1852,8 @@ class DatasetRetrieval:
         for dataset in results:
             if not dataset:
                 continue
+            if dataset.provider == "external":
+                PlatformRuntimeGuard.ensure_external_dataset_allowed(dataset)
             available_datasets.append(dataset)
         return available_datasets
 

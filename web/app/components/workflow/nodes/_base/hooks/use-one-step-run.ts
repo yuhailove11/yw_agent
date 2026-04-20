@@ -81,6 +81,7 @@ const checkValidFns: Partial<Record<BlockEnum, Function>> = {
   [BlockEnum.TemplateTransform]: checkTemplateTransformValid,
   [BlockEnum.QuestionClassifier]: checkQuestionClassifyValid,
   [BlockEnum.HttpRequest]: checkHttpValid,
+  [BlockEnum.RegistryApi]: checkHttpValid,
   [BlockEnum.Tool]: checkToolValid,
   [BlockEnum.VariableAssigner]: checkAssignerValid,
   [BlockEnum.VariableAggregator]: checkVariableAssignerValid,

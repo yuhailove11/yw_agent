@@ -34,6 +34,7 @@ from models.dataset import (
 from models.dataset import Document as DatasetDocument
 from models.model import UploadFile
 from services.external_knowledge_service import ExternalDatasetService
+from services.platform_governance.runtime_guard import PlatformRuntimeGuard
 
 
 class SegmentAttachmentResult(TypedDict):
@@ -181,6 +182,7 @@ class RetrievalService:
         dataset = db.session.scalar(stmt)
         if not dataset:
             return []
+        PlatformRuntimeGuard.ensure_external_dataset_allowed(dataset)
         metadata_condition = (
             MetadataFilteringCondition.model_validate(metadata_filtering_conditions)
             if metadata_filtering_conditions

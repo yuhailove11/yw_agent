@@ -2562,3 +2562,74 @@ class TenantCreditPool(TypeBase):
 
     def has_sufficient_credits(self, required_credits: int) -> bool:
         return self.remaining_credits >= required_credits
+
+
+class DifyRegistryAppBinding(TypeBase):
+    __tablename__ = "dify_registry_app_bindings"
+    __table_args__ = (
+        sa.PrimaryKeyConstraint("id", name="dify_registry_app_binding_pkey"),
+        sa.Index("dify_registry_app_binding_app_id_idx", "app_id"),
+        sa.Index("dify_registry_app_binding_resource_code_idx", "resource_code"),
+    )
+
+    id: Mapped[str] = mapped_column(
+        StringUUID, insert_default=lambda: str(uuid4()), default_factory=lambda: str(uuid4()), init=False
+    )
+    app_id: Mapped[str] = mapped_column(StringUUID, nullable=False)
+    tenant_id: Mapped[str] = mapped_column(StringUUID, nullable=False)
+    resource_code: Mapped[str] = mapped_column(String(255), nullable=False)
+    sync_status: Mapped[str] = mapped_column(String(32), nullable=False, server_default=sa.text("'synced'"))
+    last_payload: Mapped[str | None] = mapped_column(LongText, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        sa.DateTime, nullable=False, server_default=func.current_timestamp(), init=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        sa.DateTime,
+        nullable=False,
+        server_default=func.current_timestamp(),
+        onupdate=func.current_timestamp(),
+        init=False,
+    )
+
+
+class DifyShadowDatasetBinding(TypeBase):
+    __tablename__ = "dify_shadow_dataset_bindings"
+    __table_args__ = (
+        sa.PrimaryKeyConstraint("id", name="dify_shadow_dataset_binding_pkey"),
+        sa.Index("dify_shadow_dataset_binding_dataset_idx", "dataset_id"),
+        sa.Index("dify_shadow_dataset_binding_resource_code_idx", "resource_code"),
+    )
+
+    id: Mapped[str] = mapped_column(
+        StringUUID, insert_default=lambda: str(uuid4()), default_factory=lambda: str(uuid4()), init=False
+    )
+    dataset_id: Mapped[str] = mapped_column(StringUUID, nullable=False)
+    tenant_id: Mapped[str] = mapped_column(StringUUID, nullable=False)
+    resource_code: Mapped[str] = mapped_column(String(255), nullable=False)
+    source_system: Mapped[str] = mapped_column(String(32), nullable=False, server_default=sa.text("'ragflow'"))
+    created_at: Mapped[datetime] = mapped_column(
+        sa.DateTime, nullable=False, server_default=func.current_timestamp(), init=False
+    )
+
+
+class DifySyncOutbox(TypeBase):
+    __tablename__ = "dify_sync_outbox"
+    __table_args__ = (
+        sa.PrimaryKeyConstraint("id", name="dify_sync_outbox_pkey"),
+        sa.Index("dify_sync_outbox_resource_type_idx", "resource_type"),
+        sa.Index("dify_sync_outbox_status_idx", "status"),
+    )
+
+    id: Mapped[str] = mapped_column(
+        StringUUID, insert_default=lambda: str(uuid4()), default_factory=lambda: str(uuid4()), init=False
+    )
+    tenant_id: Mapped[str] = mapped_column(StringUUID, nullable=False)
+    resource_type: Mapped[str] = mapped_column(String(64), nullable=False)
+    resource_id: Mapped[str] = mapped_column(StringUUID, nullable=False)
+    operation: Mapped[str] = mapped_column(String(32), nullable=False)
+    payload: Mapped[str] = mapped_column(LongText, nullable=False, server_default=sa.text("'{}'"))
+    status: Mapped[str] = mapped_column(String(32), nullable=False, server_default=sa.text("'pending'"))
+    error_message: Mapped[str | None] = mapped_column(LongText, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        sa.DateTime, nullable=False, server_default=func.current_timestamp(), init=False
+    )

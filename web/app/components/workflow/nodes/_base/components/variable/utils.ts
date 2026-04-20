@@ -443,7 +443,8 @@ const formatItem = (
       break
     }
 
-    case BlockEnum.HttpRequest: {
+    case BlockEnum.HttpRequest:
+    case BlockEnum.RegistryApi: {
       res.vars = HTTP_REQUEST_OUTPUT_STRUCT
       break
     }
@@ -1398,7 +1399,8 @@ export const getNodeUsedVars = (node: Node): ValueSelector[] => {
       res.push(...matchNotSystemVars(classes))
       break
     }
-    case BlockEnum.HttpRequest: {
+    case BlockEnum.HttpRequest:
+    case BlockEnum.RegistryApi: {
       const payload = data as HttpNodeType
       res = matchNotSystemVars([
         payload.url,
@@ -1582,7 +1584,8 @@ export const getNodeUsedVarPassToServerKey = (
       res = 'query'
       break
     }
-    case BlockEnum.HttpRequest: {
+    case BlockEnum.HttpRequest:
+    case BlockEnum.RegistryApi: {
       res = `#${valueSelector.join('.')}#`
       break
     }
@@ -1782,7 +1785,8 @@ export const updateNodeVars = (
         )
         break
       }
-      case BlockEnum.HttpRequest: {
+      case BlockEnum.HttpRequest:
+      case BlockEnum.RegistryApi: {
         const payload = data as HttpNodeType
         payload.url = replaceOldVarInText(
           payload.url,
@@ -2074,7 +2078,8 @@ export const getNodeOutputVars = (
       break
     }
 
-    case BlockEnum.HttpRequest: {
+    case BlockEnum.HttpRequest:
+    case BlockEnum.RegistryApi: {
       varsToValueSelectorList(HTTP_REQUEST_OUTPUT_STRUCT, [id], res)
       break
     }

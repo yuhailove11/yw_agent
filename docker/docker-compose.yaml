@@ -5,6 +5,13 @@
 # ==================================================================
 
 x-shared-env: &shared-api-worker-env
+  PLATFORM_GOVERNANCE_ENABLED: ${PLATFORM_GOVERNANCE_ENABLED:-false}
+  PLATFORM_API_BASE_URL: ${PLATFORM_API_BASE_URL:-http://yw-platform:8088/api}
+  PLATFORM_API_KEY: ${PLATFORM_API_KEY:-}
+  PLATFORM_DISABLE_NATIVE_DATASET_WRITE: ${PLATFORM_DISABLE_NATIVE_DATASET_WRITE:-false}
+  PLATFORM_ONLY_EXTERNAL_APPROVED_KNOWLEDGE: ${PLATFORM_ONLY_EXTERNAL_APPROVED_KNOWLEDGE:-false}
+  DIFY_DEBUG: ${DIFY_DEBUG:-false}
+  DIFY_FLASK_DEBUG: ${DIFY_FLASK_DEBUG:-false}
   CONSOLE_API_URL: ${CONSOLE_API_URL:-}
   CONSOLE_WEB_URL: ${CONSOLE_WEB_URL:-}
   SERVICE_API_URL: ${SERVICE_API_URL:-}
@@ -717,6 +724,14 @@ x-shared-env: &shared-api-worker-env
   HUMAN_INPUT_TIMEOUT_TASK_INTERVAL: ${HUMAN_INPUT_TIMEOUT_TASK_INTERVAL:-1}
   SANDBOX_EXPIRED_RECORDS_CLEAN_TASK_LOCK_TTL: ${SANDBOX_EXPIRED_RECORDS_CLEAN_TASK_LOCK_TTL:-90000}
 
+x-local-api-build: &local-api-build
+  context: ../api
+  dockerfile: Dockerfile
+
+x-local-web-build: &local-web-build
+  context: ..
+  dockerfile: web/Dockerfile
+
 services:
   # Init container to fix permissions
   init_permissions:
@@ -739,13 +754,16 @@ services:
 
   # API service
   api:
-    image: langgenius/dify-api:1.13.3
+    build: *local-api-build
+    image: yw-agent-dify-api:1.13.3-local
     restart: always
     environment:
       # Use the shared environment variables.
       <<: *shared-api-worker-env
       # Startup mode, 'api' starts the API server.
       MODE: api
+      DEBUG: ${DIFY_DEBUG:-false}
+      FLASK_DEBUG: ${DIFY_FLASK_DEBUG:-false}
       SENTRY_DSN: ${API_SENTRY_DSN:-}
       SENTRY_TRACES_SAMPLE_RATE: ${API_SENTRY_TRACES_SAMPLE_RATE:-1.0}
       SENTRY_PROFILES_SAMPLE_RATE: ${API_SENTRY_PROFILES_SAMPLE_RATE:-1.0}
@@ -754,6 +772,11 @@ services:
       PLUGIN_MAX_PACKAGE_SIZE: ${PLUGIN_MAX_PACKAGE_SIZE:-52428800}
       PLUGIN_DAEMON_TIMEOUT: ${PLUGIN_DAEMON_TIMEOUT:-600.0}
       INNER_API_KEY_FOR_PLUGIN: ${PLUGIN_DIFY_INNER_API_KEY:-QaHbTe77CtuXmsfyhR7+vRjI/+XbV1AaFy691iy+kGDv2Jvy0/eAh8Y1}
+      PLATFORM_GOVERNANCE_ENABLED: ${PLATFORM_GOVERNANCE_ENABLED:-false}
+      PLATFORM_API_BASE_URL: ${PLATFORM_API_BASE_URL:-}
+      PLATFORM_API_KEY: ${PLATFORM_API_KEY:-}
+      PLATFORM_DISABLE_NATIVE_DATASET_WRITE: ${PLATFORM_DISABLE_NATIVE_DATASET_WRITE:-false}
+      PLATFORM_ONLY_EXTERNAL_APPROVED_KNOWLEDGE: ${PLATFORM_ONLY_EXTERNAL_APPROVED_KNOWLEDGE:-false}
     depends_on:
       init_permissions:
         condition: service_completed_successfully
@@ -787,18 +810,26 @@ services:
   # worker service
   # The Celery worker for processing all queues (dataset, workflow, mail, etc.)
   worker:
-    image: langgenius/dify-api:1.13.3
+    build: *local-api-build
+    image: yw-agent-dify-api:1.13.3-local
     restart: always
     environment:
       # Use the shared environment variables.
       <<: *shared-api-worker-env
       # Startup mode, 'worker' starts the Celery worker for processing all queues.
       MODE: worker
+      DEBUG: ${DIFY_DEBUG:-false}
+      FLASK_DEBUG: ${DIFY_FLASK_DEBUG:-false}
       SENTRY_DSN: ${API_SENTRY_DSN:-}
       SENTRY_TRACES_SAMPLE_RATE: ${API_SENTRY_TRACES_SAMPLE_RATE:-1.0}
       SENTRY_PROFILES_SAMPLE_RATE: ${API_SENTRY_PROFILES_SAMPLE_RATE:-1.0}
       PLUGIN_MAX_PACKAGE_SIZE: ${PLUGIN_MAX_PACKAGE_SIZE:-52428800}
       INNER_API_KEY_FOR_PLUGIN: ${PLUGIN_DIFY_INNER_API_KEY:-QaHbTe77CtuXmsfyhR7+vRjI/+XbV1AaFy691iy+kGDv2Jvy0/eAh8Y1}
+      PLATFORM_GOVERNANCE_ENABLED: ${PLATFORM_GOVERNANCE_ENABLED:-false}
+      PLATFORM_API_BASE_URL: ${PLATFORM_API_BASE_URL:-}
+      PLATFORM_API_KEY: ${PLATFORM_API_KEY:-}
+      PLATFORM_DISABLE_NATIVE_DATASET_WRITE: ${PLATFORM_DISABLE_NATIVE_DATASET_WRITE:-false}
+      PLATFORM_ONLY_EXTERNAL_APPROVED_KNOWLEDGE: ${PLATFORM_ONLY_EXTERNAL_APPROVED_KNOWLEDGE:-false}
     depends_on:
       init_permissions:
         condition: service_completed_successfully
@@ -833,13 +864,21 @@ services:
   # worker_beat service
   # Celery beat for scheduling periodic tasks.
   worker_beat:
-    image: langgenius/dify-api:1.13.3
+    build: *local-api-build
+    image: yw-agent-dify-api:1.13.3-local
     restart: always
     environment:
       # Use the shared environment variables.
       <<: *shared-api-worker-env
       # Startup mode, 'worker_beat' starts the Celery beat for scheduling periodic tasks.
       MODE: beat
+      DEBUG: ${DIFY_DEBUG:-false}
+      FLASK_DEBUG: ${DIFY_FLASK_DEBUG:-false}
+      PLATFORM_GOVERNANCE_ENABLED: ${PLATFORM_GOVERNANCE_ENABLED:-false}
+      PLATFORM_API_BASE_URL: ${PLATFORM_API_BASE_URL:-}
+      PLATFORM_API_KEY: ${PLATFORM_API_KEY:-}
+      PLATFORM_DISABLE_NATIVE_DATASET_WRITE: ${PLATFORM_DISABLE_NATIVE_DATASET_WRITE:-false}
+      PLATFORM_ONLY_EXTERNAL_APPROVED_KNOWLEDGE: ${PLATFORM_ONLY_EXTERNAL_APPROVED_KNOWLEDGE:-false}
     depends_on:
       init_permissions:
         condition: service_completed_successfully
@@ -870,7 +909,8 @@ services:
 
   # Frontend web application.
   web:
-    image: langgenius/dify-web:1.13.3
+    build: *local-web-build
+    image: yw-agent-dify-web:1.13.3-local
     restart: always
     environment:
       CONSOLE_API_URL: ${CONSOLE_API_URL:-}
@@ -1166,6 +1206,7 @@ services:
     depends_on:
       - api
       - web
+      - plugin_daemon
     ports:
       - "${EXPOSE_NGINX_PORT:-80}:${NGINX_PORT:-80}"
       - "${EXPOSE_NGINX_SSL_PORT:-443}:${NGINX_SSL_PORT:-443}"

@@ -18,6 +18,7 @@ import loopStartDefault from '@/app/components/workflow/nodes/loop-start/default
 import loopDefault from '@/app/components/workflow/nodes/loop/default'
 import parameterExtractorDefault from '@/app/components/workflow/nodes/parameter-extractor/default'
 import questionClassifierDefault from '@/app/components/workflow/nodes/question-classifier/default'
+import registryApiDefault from '@/app/components/workflow/nodes/registry-api/default'
 import templateTransformDefault from '@/app/components/workflow/nodes/template-transform/default'
 import toolDefault from '@/app/components/workflow/nodes/tool/default'
 import variableAggregatorDefault from '@/app/components/workflow/nodes/variable-assigner/default'
@@ -40,6 +41,7 @@ export const WORKFLOW_COMMON_NODES = [
   assignerDefault,
   parameterExtractorDefault,
   httpRequestDefault,
+  registryApiDefault,
   listOperatorDefault,
   toolDefault,
   humanInputDefault,

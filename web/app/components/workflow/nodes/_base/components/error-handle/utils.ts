@@ -32,7 +32,7 @@ export const getDefaultValue = (data: CommonNodeType) => {
     }]
   }
 
-  if (type === BlockEnum.HttpRequest) {
+  if (type === BlockEnum.HttpRequest || type === BlockEnum.RegistryApi) {
     return [
       {
         key: 'body',

@@ -73,6 +73,7 @@ export const useAvailableNodesMetaData = () => {
       nodesMap: {
         ...availableNodesMetaDataMap,
         [BlockEnum.VariableAssigner]: availableNodesMetaDataMap?.[BlockEnum.VariableAggregator],
+        [BlockEnum.RegistryApi]: availableNodesMetaDataMap?.[BlockEnum.RegistryApi],
       },
     }
   }, [availableNodesMetaData, availableNodesMetaDataMap])

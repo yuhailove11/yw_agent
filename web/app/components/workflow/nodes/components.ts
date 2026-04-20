@@ -36,6 +36,8 @@ import ParameterExtractorNode from './parameter-extractor/node'
 import ParameterExtractorPanel from './parameter-extractor/panel'
 import QuestionClassifierNode from './question-classifier/node'
 import QuestionClassifierPanel from './question-classifier/panel'
+import RegistryApiNode from './registry-api/node'
+import RegistryApiPanel from './registry-api/panel'
 import StartNode from './start/node'
 import StartPanel from './start/panel'
 import TemplateTransformNode from './template-transform/node'
@@ -62,6 +64,7 @@ export const NodeComponentMap: Record<string, ComponentType<any>> = {
   [BlockEnum.Code]: CodeNode,
   [BlockEnum.TemplateTransform]: TemplateTransformNode,
   [BlockEnum.HttpRequest]: HttpNode,
+  [BlockEnum.RegistryApi]: RegistryApiNode,
   [BlockEnum.Tool]: ToolNode,
   [BlockEnum.VariableAssigner]: VariableAssignerNode,
   [BlockEnum.Assigner]: AssignerNode,
@@ -91,6 +94,7 @@ export const PanelComponentMap: Record<string, ComponentType<any>> = {
   [BlockEnum.Code]: CodePanel,
   [BlockEnum.TemplateTransform]: TemplateTransformPanel,
   [BlockEnum.HttpRequest]: HttpPanel,
+  [BlockEnum.RegistryApi]: RegistryApiPanel,
   [BlockEnum.Tool]: ToolPanel,
   [BlockEnum.VariableAssigner]: VariableAssignerPanel,
   [BlockEnum.VariableAggregator]: VariableAssignerPanel,

@@ -188,7 +188,7 @@ describe('getNestedNodePosition', () => {
 })
 
 describe('hasRetryNode', () => {
-  it.each([BlockEnum.LLM, BlockEnum.Tool, BlockEnum.HttpRequest, BlockEnum.Code])(
+  it.each([BlockEnum.LLM, BlockEnum.Tool, BlockEnum.HttpRequest, BlockEnum.RegistryApi, BlockEnum.Code])(
     'should return true for %s',
     (nodeType) => {
       expect(hasRetryNode(nodeType)).toBe(true)

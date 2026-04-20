@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 from werkzeug.exceptions import Forbidden, InternalServerError, NotFound
 
 import services
+from configs import dify_config
 from controllers.common.schema import get_or_create_model, register_schema_models
 from controllers.console import console_ns
 from controllers.console.datasets.error import DatasetNameDuplicateError
@@ -123,6 +124,8 @@ class ExternalApiTemplateListApi(Resource):
     @login_required
     @account_initialization_required
     def get(self):
+        if dify_config.PLATFORM_GOVERNANCE_ENABLED and dify_config.PLATFORM_ONLY_EXTERNAL_APPROVED_KNOWLEDGE:
+            raise Forbidden("平台治理已启用，外部知识源由统一平台注册中心自动投影，禁止手工维护。")
         _, current_tenant_id = current_account_with_tenant()
         query = ExternalApiTemplateListQuery.model_validate(request.args.to_dict())
 
@@ -143,6 +146,8 @@ class ExternalApiTemplateListApi(Resource):
     @account_initialization_required
     @console_ns.expect(console_ns.models[ExternalKnowledgeApiPayload.__name__])
     def post(self):
+        if dify_config.PLATFORM_GOVERNANCE_ENABLED and dify_config.PLATFORM_ONLY_EXTERNAL_APPROVED_KNOWLEDGE:
+            raise Forbidden("平台治理已启用，外部知识源由统一平台注册中心自动投影，禁止手工维护。")
         current_user, current_tenant_id = current_account_with_tenant()
         payload = ExternalKnowledgeApiPayload.model_validate(console_ns.payload or {})
 
@@ -173,6 +178,8 @@ class ExternalApiTemplateApi(Resource):
     @login_required
     @account_initialization_required
     def get(self, external_knowledge_api_id):
+        if dify_config.PLATFORM_GOVERNANCE_ENABLED and dify_config.PLATFORM_ONLY_EXTERNAL_APPROVED_KNOWLEDGE:
+            raise Forbidden("平台治理已启用，外部知识源由统一平台注册中心自动投影，禁止手工维护。")
         _, current_tenant_id = current_account_with_tenant()
         external_knowledge_api_id = str(external_knowledge_api_id)
         external_knowledge_api = ExternalDatasetService.get_external_knowledge_api(
@@ -188,6 +195,8 @@ class ExternalApiTemplateApi(Resource):
     @account_initialization_required
     @console_ns.expect(console_ns.models[ExternalKnowledgeApiPayload.__name__])
     def patch(self, external_knowledge_api_id):
+        if dify_config.PLATFORM_GOVERNANCE_ENABLED and dify_config.PLATFORM_ONLY_EXTERNAL_APPROVED_KNOWLEDGE:
+            raise Forbidden("平台治理已启用，外部知识源由统一平台注册中心自动投影，禁止手工维护。")
         current_user, current_tenant_id = current_account_with_tenant()
         external_knowledge_api_id = str(external_knowledge_api_id)
 
@@ -207,6 +216,8 @@ class ExternalApiTemplateApi(Resource):
     @login_required
     @account_initialization_required
     def delete(self, external_knowledge_api_id):
+        if dify_config.PLATFORM_GOVERNANCE_ENABLED and dify_config.PLATFORM_ONLY_EXTERNAL_APPROVED_KNOWLEDGE:
+            raise Forbidden("平台治理已启用，外部知识源由统一平台注册中心自动投影，禁止手工维护。")
         current_user, current_tenant_id = current_account_with_tenant()
         external_knowledge_api_id = str(external_knowledge_api_id)
 
@@ -227,6 +238,8 @@ class ExternalApiUseCheckApi(Resource):
     @login_required
     @account_initialization_required
     def get(self, external_knowledge_api_id):
+        if dify_config.PLATFORM_GOVERNANCE_ENABLED and dify_config.PLATFORM_ONLY_EXTERNAL_APPROVED_KNOWLEDGE:
+            raise Forbidden("平台治理已启用，外部知识源由统一平台注册中心自动投影，禁止手工维护。")
         _, current_tenant_id = current_account_with_tenant()
         external_knowledge_api_id = str(external_knowledge_api_id)
 
@@ -249,6 +262,8 @@ class ExternalDatasetCreateApi(Resource):
     @account_initialization_required
     @edit_permission_required
     def post(self):
+        if dify_config.PLATFORM_GOVERNANCE_ENABLED and dify_config.PLATFORM_ONLY_EXTERNAL_APPROVED_KNOWLEDGE:
+            raise Forbidden("平台治理已启用，外部知识库由统一平台注册中心自动投影，禁止手工创建。")
         # The role of the current user in the ta table must be admin, owner, or editor
         current_user, current_tenant_id = current_account_with_tenant()
         payload = ExternalDatasetCreatePayload.model_validate(console_ns.payload or {})

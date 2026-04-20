@@ -459,6 +459,26 @@ describe('initialNodes', () => {
     expect(result[0].data.retry_config).toEqual(existingConfig)
   })
 
+  it('should add default retry_config for RegistryApi nodes', () => {
+    const nodes = [
+      createNode({
+        id: 'registry-api-1',
+        data: {
+          type: BlockEnum.RegistryApi,
+          title: '',
+          desc: '',
+        },
+      }),
+    ]
+
+    const result = initialNodes(nodes, [])
+    expect(result[0].data.retry_config).toEqual({
+      retry_enabled: true,
+      max_retries: DEFAULT_RETRY_MAX,
+      retry_interval: DEFAULT_RETRY_INTERVAL,
+    })
+  })
+
   it('should migrate legacy Tool node configurations', () => {
     const nodes = [
       createNode({

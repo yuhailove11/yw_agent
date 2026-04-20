@@ -97,6 +97,7 @@ from .datasets import (
     metadata,
     website,
 )
+from .platform_governance import status
 from .datasets.rag_pipeline import (
     datasource_auth,
     datasource_content_preview,

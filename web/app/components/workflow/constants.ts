@@ -117,6 +117,7 @@ export const SUPPORT_OUTPUT_VARS_NODE = [
   BlockEnum.Code,
   BlockEnum.TemplateTransform,
   BlockEnum.HttpRequest,
+  BlockEnum.RegistryApi,
   BlockEnum.Tool,
   BlockEnum.VariableAssigner,
   BlockEnum.VariableAggregator,

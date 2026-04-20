@@ -21,6 +21,7 @@ describe('canRunBySingle', () => {
     BlockEnum.TemplateTransform,
     BlockEnum.QuestionClassifier,
     BlockEnum.HttpRequest,
+    BlockEnum.RegistryApi,
     BlockEnum.Tool,
     BlockEnum.ParameterExtractor,
     BlockEnum.Iteration,
@@ -71,7 +72,7 @@ describe('isSupportCustomRunForm', () => {
 })
 
 describe('hasErrorHandleNode', () => {
-  it.each([BlockEnum.LLM, BlockEnum.Tool, BlockEnum.HttpRequest, BlockEnum.Code, BlockEnum.Agent])(
+  it.each([BlockEnum.LLM, BlockEnum.Tool, BlockEnum.HttpRequest, BlockEnum.RegistryApi, BlockEnum.Code, BlockEnum.Agent])(
     'should return true for %s',
     (type) => {
       expect(hasErrorHandleNode(type)).toBe(true)

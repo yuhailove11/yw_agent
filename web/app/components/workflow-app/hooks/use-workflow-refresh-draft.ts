@@ -2,6 +2,7 @@ import type { WorkflowDataUpdater } from '@/app/components/workflow/types'
 import { useCallback } from 'react'
 import { useWorkflowUpdate } from '@/app/components/workflow/hooks'
 import { useWorkflowStore } from '@/app/components/workflow/store'
+import { decodeRegistryApiNodes } from '@/app/components/workflow/utils/registry-api-transform'
 import { fetchWorkflowDraft } from '@/service/workflow'
 
 export const useWorkflowRefreshDraft = () => {
@@ -33,7 +34,7 @@ export const useWorkflowRefreshDraft = () => {
         // Ensure we have a valid workflow structure with viewport
         if (!notUpdateCanvas) {
           const workflowData: WorkflowDataUpdater = {
-            nodes: response.graph?.nodes || [],
+            nodes: decodeRegistryApiNodes(response.graph?.nodes || []),
             edges: response.graph?.edges || [],
             viewport: response.graph?.viewport || { x: 0, y: 0, zoom: 1 },
           }

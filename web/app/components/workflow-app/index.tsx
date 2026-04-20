@@ -19,6 +19,7 @@ import {
   initialEdges,
   initialNodes,
 } from '@/app/components/workflow/utils'
+import { decodeRegistryApiNodes } from '@/app/components/workflow/utils/registry-api-transform'
 import { useAppContext } from '@/context/app-context'
 import { useSearchParams } from '@/next/navigation'
 import { fetchRunDetail } from '@/service/log'
@@ -77,18 +78,25 @@ const WorkflowAppWithAdditionalContext = () => {
     }
   }, [workflowStore])
 
+  const decodedNodes = useMemo(() => {
+    if (!data)
+      return []
+
+    return decodeRegistryApiNodes(data.graph.nodes)
+  }, [data])
+
   const nodesData = useMemo(() => {
     if (data)
-      return initialNodes(data.graph.nodes, data.graph.edges)
+      return initialNodes(decodedNodes, data.graph.edges)
 
     return []
-  }, [data])
+  }, [data, decodedNodes])
   const edgesData = useMemo(() => {
     if (data)
-      return initialEdges(data.graph.edges, data.graph.nodes)
+      return initialEdges(data.graph.edges, decodedNodes)
 
     return []
-  }, [data])
+  }, [data, decodedNodes])
 
   const searchParams = useSearchParams()
   const { getWorkflowRunAndTraceUrl } = useGetRunAndTraceUrl()

@@ -281,7 +281,7 @@ export const initialNodes = (originNodes: Node[], originEdges: Edge[]) => {
     if (node.data.type === BlockEnum.ParameterExtractor)
       (node as any).data.model.provider = correctModelProvider((node as any).data.model.provider)
 
-    if (node.data.type === BlockEnum.HttpRequest && !node.data.retry_config) {
+    if ((node.data.type === BlockEnum.HttpRequest || node.data.type === BlockEnum.RegistryApi) && !node.data.retry_config) {
       node.data.retry_config = {
         retry_enabled: true,
         max_retries: DEFAULT_RETRY_MAX,

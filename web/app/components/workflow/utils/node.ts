@@ -143,7 +143,7 @@ export const getNestedNodePosition = (node: Node, parentNode: Node) => {
 }
 
 export const hasRetryNode = (nodeType?: BlockEnum) => {
-  return nodeType === BlockEnum.LLM || nodeType === BlockEnum.Tool || nodeType === BlockEnum.HttpRequest || nodeType === BlockEnum.Code
+  return nodeType === BlockEnum.LLM || nodeType === BlockEnum.Tool || nodeType === BlockEnum.HttpRequest || nodeType === BlockEnum.RegistryApi || nodeType === BlockEnum.Code
 }
 
 export const getNodeCustomTypeByNodeDataType = (nodeType: BlockEnum) => {

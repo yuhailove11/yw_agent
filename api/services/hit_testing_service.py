@@ -15,6 +15,7 @@ from extensions.ext_database import db
 from models import Account
 from models.dataset import Dataset, DatasetQuery
 from models.enums import CreatorUserRole, DatasetQuerySource
+from services.platform_governance.runtime_guard import PlatformRuntimeGuard
 
 logger = logging.getLogger(__name__)
 
@@ -133,6 +134,7 @@ class HitTestingService:
                 "query": {"content": query},
                 "records": [],
             }
+        PlatformRuntimeGuard.ensure_external_dataset_allowed(dataset, user_id=account.id)
 
         start = time.perf_counter()
 

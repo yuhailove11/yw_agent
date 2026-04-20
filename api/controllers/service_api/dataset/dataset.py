@@ -197,6 +197,10 @@ class DatasetListApi(DatasetApiResource):
     @cloud_edition_billing_rate_limit_check("knowledge", "dataset")
     def post(self, tenant_id):
         """Resource for creating datasets."""
+        from configs import dify_config
+
+        if dify_config.PLATFORM_GOVERNANCE_ENABLED and dify_config.PLATFORM_DISABLE_NATIVE_DATASET_WRITE:
+            raise Forbidden("平台治理已启用，Dify 原生知识库创建已禁用，请使用已审批知识库。")
         payload = DatasetCreatePayload.model_validate(service_api_ns.payload or {})
 
         embedding_model_provider = payload.embedding_model_provider
@@ -312,6 +316,10 @@ class DatasetApi(DatasetApiResource):
     )
     @cloud_edition_billing_rate_limit_check("knowledge", "dataset")
     def patch(self, _, dataset_id):
+        from configs import dify_config
+
+        if dify_config.PLATFORM_GOVERNANCE_ENABLED and dify_config.PLATFORM_DISABLE_NATIVE_DATASET_WRITE:
+            raise Forbidden("平台治理已启用，Dify 原生知识库修改已禁用，请在知识库主系统处理。")
         dataset_id_str = str(dataset_id)
         dataset = DatasetService.get_dataset(dataset_id_str)
         if dataset is None:

@@ -36,6 +36,7 @@ export enum BlockEnum {
   Code = 'code',
   TemplateTransform = 'template-transform',
   HttpRequest = 'http-request',
+  RegistryApi = 'registry-api',
   VariableAssigner = 'variable-assigner',
   VariableAggregator = 'variable-aggregator',
   Tool = 'tool',

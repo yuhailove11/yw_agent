@@ -6,6 +6,7 @@ import { useFeaturesStore } from '@/app/components/base/features/hooks'
 import { useSerialAsyncCallback } from '@/app/components/workflow/hooks/use-serial-async-callback'
 import { useNodesReadOnly } from '@/app/components/workflow/hooks/use-workflow'
 import { useWorkflowStore } from '@/app/components/workflow/store'
+import { encodeRegistryApiNodes } from '@/app/components/workflow/utils/registry-api-transform'
 import { API_PREFIX } from '@/config'
 import { postWithKeepalive } from '@/service/fetch'
 import { syncWorkflowDraft } from '@/service/workflow'
@@ -38,11 +39,13 @@ export const useNodesSyncDraft = () => {
       return null
 
     const features = featuresStore!.getState().features
-    const producedNodes = produce(nodes, (draft) => {
+    const encodedNodes = encodeRegistryApiNodes(nodes)
+    const producedNodes = produce(encodedNodes, (draft) => {
       draft.forEach((node) => {
-        Object.keys(node.data).forEach((key) => {
+        const nodeData = node.data as Record<string, unknown>
+        Object.keys(nodeData).forEach((key) => {
           if (key.startsWith('_'))
-            delete node.data[key]
+            delete nodeData[key]
         })
       })
     })

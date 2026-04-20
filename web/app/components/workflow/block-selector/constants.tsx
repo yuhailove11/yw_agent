@@ -144,6 +144,11 @@ export const BLOCKS = [
   },
   {
     classification: BlockClassificationEnum.Utilities,
+    type: BlockEnum.RegistryApi,
+    title: 'Registry API',
+  },
+  {
+    classification: BlockClassificationEnum.Utilities,
     type: BlockEnum.ListFilter,
     title: 'List Filter',
   },

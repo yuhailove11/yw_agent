@@ -28,7 +28,7 @@ describe('variableTransformer', () => {
 })
 
 describe('isExceptionVariable', () => {
-  const errorHandleTypes = [BlockEnum.LLM, BlockEnum.Tool, BlockEnum.HttpRequest, BlockEnum.Code, BlockEnum.Agent]
+  const errorHandleTypes = [BlockEnum.LLM, BlockEnum.Tool, BlockEnum.HttpRequest, BlockEnum.RegistryApi, BlockEnum.Code, BlockEnum.Agent]
 
   it.each(errorHandleTypes)('should return true for error_message with %s node type', (nodeType) => {
     expect(isExceptionVariable('error_message', nodeType)).toBe(true)

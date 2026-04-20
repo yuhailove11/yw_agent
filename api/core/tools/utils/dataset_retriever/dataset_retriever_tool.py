@@ -15,6 +15,7 @@ from extensions.ext_database import db
 from models.dataset import Dataset
 from models.dataset import Document as DatasetDocument
 from services.external_knowledge_service import ExternalDatasetService
+from services.platform_governance.runtime_guard import PlatformRuntimeGuard
 
 default_retrieval_model: DefaultRetrievalModelDict = {
     "search_method": RetrievalMethod.SEMANTIC_SEARCH,
@@ -62,6 +63,8 @@ class DatasetRetrieverTool(DatasetRetrieverBaseTool):
 
         if not dataset:
             return ""
+        if dataset.provider == "external":
+            PlatformRuntimeGuard.ensure_external_dataset_allowed(dataset, user_id=self.user_id)
         for hit_callback in self.hit_callbacks:
             hit_callback.on_query(query, dataset.id)
         dataset_retrieval = DatasetRetrieval()
