@@ -2633,3 +2633,82 @@ class DifySyncOutbox(TypeBase):
     created_at: Mapped[datetime] = mapped_column(
         sa.DateTime, nullable=False, server_default=func.current_timestamp(), init=False
     )
+
+
+class PlatformAuthUserBinding(TypeBase):
+    __tablename__ = "platform_auth_user_bindings"
+    __table_args__ = (
+        sa.PrimaryKeyConstraint("id", name="platform_auth_user_binding_pkey"),
+        sa.UniqueConstraint("platform_user_id", "system_code", name="uniq_platform_auth_user_binding"),
+        sa.Index("platform_auth_user_binding_account_id_idx", "account_id"),
+    )
+
+    id: Mapped[str] = mapped_column(
+        StringUUID,
+        insert_default=lambda: str(uuid4()),
+        default_factory=lambda: str(uuid4()),
+        init=False,
+    )
+    platform_user_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    account_id: Mapped[str] = mapped_column(StringUUID, nullable=False)
+    system_code: Mapped[str] = mapped_column(String(32), nullable=False, default="dify")
+    platform_username: Mapped[str | None] = mapped_column(String(255), nullable=True, default=None)
+    status: Mapped[str] = mapped_column(
+        String(32),
+        nullable=False,
+        server_default=sa.text("'active'"),
+        default="active",
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        sa.DateTime,
+        nullable=False,
+        server_default=func.current_timestamp(),
+        init=False,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        sa.DateTime,
+        nullable=False,
+        server_default=func.current_timestamp(),
+        onupdate=func.current_timestamp(),
+        init=False,
+    )
+
+
+class PlatformAuthWorkspaceBinding(TypeBase):
+    __tablename__ = "platform_auth_workspace_bindings"
+    __table_args__ = (
+        sa.PrimaryKeyConstraint("id", name="platform_auth_workspace_binding_pkey"),
+        sa.UniqueConstraint("platform_workspace_id", "system_code", name="uniq_platform_auth_workspace_binding"),
+        sa.Index("platform_auth_workspace_binding_tenant_id_idx", "tenant_id"),
+    )
+
+    id: Mapped[str] = mapped_column(
+        StringUUID,
+        insert_default=lambda: str(uuid4()),
+        default_factory=lambda: str(uuid4()),
+        init=False,
+    )
+    platform_workspace_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    tenant_id: Mapped[str] = mapped_column(StringUUID, nullable=False)
+    system_code: Mapped[str] = mapped_column(String(32), nullable=False, default="dify")
+    platform_workspace_code: Mapped[str | None] = mapped_column(String(255), nullable=True, default=None)
+    platform_workspace_name: Mapped[str | None] = mapped_column(String(255), nullable=True, default=None)
+    status: Mapped[str] = mapped_column(
+        String(32),
+        nullable=False,
+        server_default=sa.text("'active'"),
+        default="active",
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        sa.DateTime,
+        nullable=False,
+        server_default=func.current_timestamp(),
+        init=False,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        sa.DateTime,
+        nullable=False,
+        server_default=func.current_timestamp(),
+        onupdate=func.current_timestamp(),
+        init=False,
+    )

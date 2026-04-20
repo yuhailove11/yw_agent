@@ -1123,6 +1123,26 @@ class PlatformGovernanceConfig(BaseSettings):
         default=True,
     )
 
+    PLATFORM_AUTH_ENABLED: bool = Field(
+        description="Enable unified platform auth integration",
+        default=False,
+    )
+
+    PLATFORM_AUTH_EXCHANGE_PATH: str = Field(
+        description="Dify console platform auth exchange path",
+        default="/console/api/platform-auth/sso/exchange",
+    )
+
+    PLATFORM_AUTH_CLIENT_ID: str = Field(
+        description="Unified platform auth client id for dify",
+        default="dify",
+    )
+
+    PLATFORM_AUTH_CLIENT_SECRET: str = Field(
+        description="Unified platform auth client secret for dify",
+        default="dify-internal-secret",
+    )
+
 
 class IndexingConfig(BaseSettings):
     """

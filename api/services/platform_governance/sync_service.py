@@ -5,8 +5,8 @@ from __future__ import annotations
 import json
 import logging
 
-from models import App
 from extensions.ext_database import db
+from models import App
 from models.model import AppModelConfig, DifyRegistryAppBinding, DifySyncOutbox
 from services.platform_governance.client import platform_governance_client
 
@@ -16,6 +16,9 @@ logger = logging.getLogger(__name__)
 class PlatformGovernanceSyncService:
     @staticmethod
     def _build_payload(app: App, app_model_config: AppModelConfig | None = None) -> dict:
+        model_config = app_model_config.to_dict() if app_model_config else None
+        if model_config is None and app.app_model_config:
+            model_config = app.app_model_config.to_dict()
         return {
             "source_id": app.id,
             "workspace_id": app.tenant_id,
@@ -28,7 +31,7 @@ class PlatformGovernanceSyncService:
             "enable_api": app.enable_api,
             "enable_site": app.enable_site,
             "workflow_id": app.workflow_id,
-            "model_config": app_model_config.to_dict() if app_model_config else (app.app_model_config.to_dict() if app.app_model_config else None),
+            "model_config": model_config,
         }
 
     @staticmethod

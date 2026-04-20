@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from sqlalchemy import select
 
-from extensions.ext_database import db
 from configs import dify_config
+from extensions.ext_database import db
 from models.dataset import Dataset
 from models.model import DifyShadowDatasetBinding
 from services.platform_governance.client import platform_governance_client

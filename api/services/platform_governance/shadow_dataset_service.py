@@ -38,10 +38,18 @@ class PlatformShadowDatasetService:
         return db.session.get(Account, account_id)
 
     @staticmethod
-    def _ensure_shared_external_api(tenant_id: str, owner_id: str, endpoint: str, api_key: str) -> ExternalKnowledgeApis:
+    def _ensure_shared_external_api(
+        tenant_id: str,
+        owner_id: str,
+        endpoint: str,
+        api_key: str,
+    ) -> ExternalKnowledgeApis:
         entity = db.session.scalar(
             select(ExternalKnowledgeApis)
-            .where(ExternalKnowledgeApis.tenant_id == tenant_id, ExternalKnowledgeApis.name == PlatformShadowDatasetService.SHARED_API_NAME)
+            .where(
+                ExternalKnowledgeApis.tenant_id == tenant_id,
+                ExternalKnowledgeApis.name == PlatformShadowDatasetService.SHARED_API_NAME,
+            )
             .limit(1)
         )
         settings = {"endpoint": endpoint.rstrip("/"), "api_key": api_key}
@@ -172,7 +180,10 @@ class PlatformShadowDatasetService:
         endpoint = str(first_content.get("retrieval_endpoint") or "").rstrip("/")
         api_key = str(first_content.get("retrieval_api_key") or "")
         if not endpoint or not api_key:
-            logger.warning("统一平台注册中心知识库缺少检索接入信息，无法投影为 Dify external dataset: tenant_id=%s", tenant_id)
+            logger.warning(
+                "统一平台注册中心知识库缺少检索接入信息，无法投影为 Dify external dataset: tenant_id=%s",
+                tenant_id,
+            )
             return {"enabled": True, "data": items, "total": len(items)}
 
         external_api = PlatformShadowDatasetService._ensure_shared_external_api(tenant_id, owner.id, endpoint, api_key)

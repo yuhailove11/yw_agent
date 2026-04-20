@@ -41,6 +41,7 @@ from . import (
     init_validate,
     notification,
     ping,
+    platform_auth,
     setup,
     spec,
     version,
@@ -97,7 +98,6 @@ from .datasets import (
     metadata,
     website,
 )
-from .platform_governance import status
 from .datasets.rag_pipeline import (
     datasource_auth,
     datasource_content_preview,
@@ -117,6 +117,8 @@ from .explore import (
     saved_message,
     trial,
 )
+from .platform_auth import sso
+from .platform_governance import status
 
 # Import tag controllers
 from .tag import tags
@@ -192,6 +194,7 @@ __all__ = [
     "ops_trace",
     "parameter",
     "ping",
+    "platform_auth",
     "plugin",
     "rag_pipeline",
     "rag_pipeline_datasets",
@@ -203,7 +206,9 @@ __all__ = [
     "setup",
     "site",
     "spec",
+    "sso",
     "statistic",
+    "status",
     "tags",
     "tool_providers",
     "trial",
