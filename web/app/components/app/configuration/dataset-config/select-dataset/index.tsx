@@ -12,6 +12,7 @@ import Loading from '@/app/components/base/loading'
 import Modal from '@/app/components/base/modal'
 import { ModelFeatureEnum } from '@/app/components/header/account-setting/model-provider-page/declarations'
 import FeatureIcon from '@/app/components/header/account-setting/model-provider-page/model-selector/feature-icon'
+import { PLATFORM_ONLY_EXTERNAL_APPROVED_KNOWLEDGE } from '@/config'
 import { useKnowledge } from '@/hooks/use-knowledge'
 import Link from '@/next/link'
 import { useInfiniteDatasets } from '@/service/knowledge/use-dataset'
@@ -34,8 +35,14 @@ const SelectDataSet: FC<ISelectDataSetProps> = ({
   const [selectedIdsInModal, setSelectedIdsInModal] = useState(() => selectedIds)
   const canSelectMulti = true
   const { formatIndexingTechniqueAndMethod } = useKnowledge()
+  const datasetQueryParams = useMemo(() => {
+    if (PLATFORM_ONLY_EXTERNAL_APPROVED_KNOWLEDGE)
+      return { page: 1, provider: 'external' }
+
+    return { page: 1 }
+  }, [])
   const { data, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = useInfiniteDatasets(
-    { page: 1 },
+    datasetQueryParams,
     { enabled: isShow, staleTime: 0, refetchOnMount: 'always' },
   )
   const datasets = useMemo(() => {
@@ -134,7 +141,7 @@ const SelectDataSet: FC<ISelectDataSetProps> = ({
                   </div>
                   <div className={cn('max-w-[200px] truncate text-[13px] font-medium text-text-secondary', !item.embedding_available && 'max-w-[120px]! opacity-30')}>{item.name}</div>
                   {!item.embedding_available && (
-                    <span className="ml-1 shrink-0 rounded-md border border-divider-deep px-1 text-xs font-normal leading-[18px] text-text-tertiary">{t('unavailable', { ns: 'dataset' })}</span>
+                    <span className="ml-1 shrink-0 rounded-md border border-divider-deep px-1 text-xs leading-[18px] font-normal text-text-tertiary">{t('unavailable', { ns: 'dataset' })}</span>
                   )}
                 </div>
                 {item.is_multimodal && (

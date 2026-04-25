@@ -119,7 +119,16 @@ class AutoDisableLogsDict(TypedDict):
 
 class DatasetService:
     @staticmethod
-    def get_datasets(page, per_page, tenant_id=None, user=None, search=None, tag_ids=None, include_all=False):
+    def get_datasets(
+        page,
+        per_page,
+        tenant_id=None,
+        user=None,
+        search=None,
+        tag_ids=None,
+        include_all=False,
+        provider=None,
+    ):
         query = select(Dataset).where(Dataset.tenant_id == tenant_id).order_by(Dataset.created_at.desc(), Dataset.id)
 
         if user:
@@ -172,6 +181,9 @@ class DatasetService:
             escaped_search = helper.escape_like_pattern(search)
             query = query.where(Dataset.name.ilike(f"%{escaped_search}%", escape="\\"))
 
+        if provider:
+            query = query.where(Dataset.provider == provider)
+
         # Check if tag_ids is not empty to avoid WHERE false condition
         if tag_ids and len(tag_ids) > 0:
             if tenant_id is not None:
@@ -209,11 +221,13 @@ class DatasetService:
         return {"mode": mode, "rules": rules}
 
     @staticmethod
-    def get_datasets_by_ids(ids, tenant_id):
+    def get_datasets_by_ids(ids, tenant_id, provider=None):
         # Check if ids is not empty to avoid WHERE false condition
         if not ids or len(ids) == 0:
             return [], 0
         stmt = select(Dataset).where(Dataset.id.in_(ids), Dataset.tenant_id == tenant_id)
+        if provider:
+            stmt = stmt.where(Dataset.provider == provider)
 
         datasets = db.paginate(select=stmt, page=1, per_page=len(ids), max_per_page=len(ids), error_out=False)
 

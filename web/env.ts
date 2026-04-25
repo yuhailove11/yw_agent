@@ -105,6 +105,7 @@ const clientSchema = {
    * The maximum number of tree node depth for workflow
    */
   NEXT_PUBLIC_MAX_TREE_DEPTH: coercedNumber.default(50),
+  NEXT_PUBLIC_PLATFORM_ONLY_EXTERNAL_APPROVED_KNOWLEDGE: coercedBoolean.default(false),
   /**
    * The URL for Web APP, refers to the Web App base URL of WEB service if web app domain is different from
    * console or api domain.
@@ -182,6 +183,7 @@ export const env = createEnv({
     NEXT_PUBLIC_MAX_ITERATIONS_NUM: isServer ? process.env.NEXT_PUBLIC_MAX_ITERATIONS_NUM : getRuntimeEnvFromBody('maxIterationsNum'),
     NEXT_PUBLIC_MAX_PARALLEL_LIMIT: isServer ? process.env.NEXT_PUBLIC_MAX_PARALLEL_LIMIT : getRuntimeEnvFromBody('maxParallelLimit'),
     NEXT_PUBLIC_MAX_TOOLS_NUM: isServer ? process.env.NEXT_PUBLIC_MAX_TOOLS_NUM : getRuntimeEnvFromBody('maxToolsNum'),
+    NEXT_PUBLIC_PLATFORM_ONLY_EXTERNAL_APPROVED_KNOWLEDGE: isServer ? process.env.NEXT_PUBLIC_PLATFORM_ONLY_EXTERNAL_APPROVED_KNOWLEDGE : getRuntimeEnvFromBody('platformOnlyExternalApprovedKnowledge'),
     NEXT_PUBLIC_MAX_TREE_DEPTH: isServer ? process.env.NEXT_PUBLIC_MAX_TREE_DEPTH : getRuntimeEnvFromBody('maxTreeDepth'),
     NEXT_PUBLIC_PUBLIC_API_PREFIX: isServer ? process.env.NEXT_PUBLIC_PUBLIC_API_PREFIX : getRuntimeEnvFromBody('publicApiPrefix'),
     NEXT_PUBLIC_SENTRY_DSN: isServer ? process.env.NEXT_PUBLIC_SENTRY_DSN : getRuntimeEnvFromBody('sentryDsn'),

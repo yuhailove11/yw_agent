@@ -27,9 +27,14 @@ const DatasetsDetailProvider: FC<DatasetsDetailProviderProps> = ({
     storeRef.current = createDatasetsDetailStore()
 
   const updateDatasetsDetail = useCallback(async (datasetIds: string[]) => {
-    const { data: datasetsDetail } = await fetchDatasets({ url: '/datasets', params: { page: 1, ids: datasetIds } })
-    if (datasetsDetail && datasetsDetail.length > 0)
-      storeRef.current!.getState().updateDatasetsDetail(datasetsDetail)
+    try {
+      const { data: datasetsDetail } = await fetchDatasets({ url: '/datasets', params: { page: 1, ids: datasetIds } })
+      if (datasetsDetail && datasetsDetail.length > 0)
+        storeRef.current!.getState().updateDatasetsDetail(datasetsDetail)
+    }
+    catch (error) {
+      console.error('加载工作流知识库详情失败', error)
+    }
   }, [])
 
   useEffect(() => {

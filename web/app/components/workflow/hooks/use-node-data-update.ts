@@ -1,4 +1,5 @@
 import type { SyncCallback } from './use-nodes-sync-draft'
+import { isEqual } from 'es-toolkit/predicate'
 import { produce } from 'immer'
 import { useCallback } from 'react'
 import { useStoreApi } from 'reactflow'
@@ -20,13 +21,21 @@ export const useNodeDataUpdate = () => {
       getNodes,
       setNodes,
     } = store.getState()
-    const newNodes = produce(getNodes(), (draft) => {
-      const currentNode = draft.find(node => node.id === id)!
+    const nodes = getNodes()
+    const currentNode = nodes.find(node => node.id === id)
+    if (!currentNode)
+      return false
+    const nextData = { ...currentNode.data, ...data }
+    if (isEqual(currentNode.data, nextData))
+      return false
 
-      if (currentNode)
-        currentNode.data = { ...currentNode.data, ...data }
+    const newNodes = produce(nodes, (draft) => {
+      const targetNode = draft.find(node => node.id === id)
+      if (targetNode)
+        targetNode.data = nextData
     })
     setNodes(newNodes)
+    return true
   }, [store])
 
   const handleNodeDataUpdateWithSyncDraft = useCallback((
@@ -40,7 +49,9 @@ export const useNodeDataUpdate = () => {
     if (getNodesReadOnly())
       return
 
-    handleNodeDataUpdate(payload)
+    const changed = handleNodeDataUpdate(payload)
+    if (!changed)
+      return
     handleSyncWorkflowDraft(options?.sync, options?.notRefreshWhenSyncError, options?.callback)
   }, [handleSyncWorkflowDraft, handleNodeDataUpdate, getNodesReadOnly])
 

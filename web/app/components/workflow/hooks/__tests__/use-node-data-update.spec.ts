@@ -95,5 +95,22 @@ describe('useNodeDataUpdate', () => {
       expect(rfState.setNodes).not.toHaveBeenCalled()
       expect(mockDoSync).not.toHaveBeenCalled()
     })
+
+    it('should skip updating and syncing when node data is unchanged', () => {
+      const mockDoSync = vi.fn().mockResolvedValue(undefined)
+
+      const { result, store } = renderWorkflowHook(() => useNodeDataUpdate(), {
+        hooksStoreProps: { doSyncWorkflowDraft: mockDoSync },
+      })
+
+      result.current.handleNodeDataUpdateWithSyncDraft({
+        id: 'node-1',
+        data: { value: 'original' },
+      })
+
+      expect(rfState.setNodes).not.toHaveBeenCalled()
+      store.getState().flushPendingSync()
+      expect(mockDoSync).not.toHaveBeenCalled()
+    })
   })
 })

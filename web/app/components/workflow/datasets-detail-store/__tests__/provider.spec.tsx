@@ -88,4 +88,29 @@ describe('datasets-detail-store provider', () => {
       expect(screen.getByText('dataset-count:2')).toBeInTheDocument()
     })
   })
+
+  it('should keep rendering when dataset detail loading fails', async () => {
+    mockFetchDatasets.mockRejectedValueOnce(new Error('load failed'))
+
+    render(
+      <DatasetsDetailProvider nodes={[
+        createWorkflowNode(['dataset-1']),
+      ]}
+      >
+        <Consumer />
+      </DatasetsDetailProvider>,
+    )
+
+    await waitFor(() => {
+      expect(mockFetchDatasets).toHaveBeenCalledWith({
+        url: '/datasets',
+        params: {
+          page: 1,
+          ids: ['dataset-1'],
+        },
+      })
+    })
+
+    expect(screen.getByText('dataset-count:0')).toBeInTheDocument()
+  })
 })

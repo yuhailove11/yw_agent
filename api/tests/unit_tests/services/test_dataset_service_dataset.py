@@ -102,6 +102,18 @@ class TestDatasetServiceQueries:
         mock_dataset_query_dependencies["get_target_ids"].assert_called_once_with("knowledge", "tenant-1", ["tag-1"])
         mock_dataset_query_dependencies["db"].paginate.assert_called_once()
 
+    def test_get_datasets_provider_filter_uses_paginate(self, mock_dataset_query_dependencies):
+        items, total = DatasetService.get_datasets(
+            page=1,
+            per_page=20,
+            tenant_id="tenant-1",
+            provider="external",
+        )
+
+        assert items == ["dataset"]
+        assert total == 1
+        mock_dataset_query_dependencies["db"].paginate.assert_called_once()
+
     def test_get_process_rules_returns_latest_rule_when_present(self):
         dataset_process_rule = Mock(spec=DatasetProcessRule)
         dataset_process_rule.mode = "automatic"
@@ -138,6 +150,16 @@ class TestDatasetServiceQueries:
             mock_db.paginate.return_value = SimpleNamespace(items=["dataset-1"], total=1)
 
             items, total = DatasetService.get_datasets_by_ids(["dataset-1"], "tenant-1")
+
+        assert items == ["dataset-1"]
+        assert total == 1
+        mock_db.paginate.assert_called_once()
+
+    def test_get_datasets_by_ids_supports_provider_filter(self):
+        with patch("services.dataset_service.db") as mock_db:
+            mock_db.paginate.return_value = SimpleNamespace(items=["dataset-1"], total=1)
+
+            items, total = DatasetService.get_datasets_by_ids(["dataset-1"], "tenant-1", "external")
 
         assert items == ["dataset-1"]
         assert total == 1

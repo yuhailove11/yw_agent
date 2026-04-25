@@ -127,6 +127,14 @@ def _validate_doc_form(value: str | None) -> str | None:
     return value
 
 
+def _validate_provider(value: str | None) -> str | None:
+    if value is None:
+        return value
+    if value not in Dataset.PROVIDER_LIST:
+        raise ValueError("Invalid provider.")
+    return value
+
+
 class DatasetCreatePayload(BaseModel):
     name: str = Field(..., min_length=1, max_length=40)
     description: str = Field("", max_length=400)
@@ -203,6 +211,12 @@ class ConsoleDatasetListQuery(BaseModel):
     include_all: bool = Field(default=False, description="Include all datasets")
     ids: list[str] = Field(default_factory=list, description="Filter by dataset IDs")
     tag_ids: list[str] = Field(default_factory=list, description="Filter by tag IDs")
+    provider: str | None = Field(default=None, description="Filter by dataset provider")
+
+    @field_validator("provider")
+    @classmethod
+    def validate_provider(cls, value: str | None) -> str | None:
+        return _validate_provider(value)
 
 
 register_schema_models(
@@ -297,6 +311,7 @@ class DatasetListApi(Resource):
             "ids": "Filter by dataset IDs (list)",
             "keyword": "Search keyword",
             "tag_ids": "Filter by tag IDs (list)",
+            "provider": "Filter by dataset provider",
             "include_all": "Include all datasets (default: false)",
         }
     )
@@ -317,9 +332,8 @@ class DatasetListApi(Resource):
         if "tag_ids" in request.args:
             query_params["tag_ids"] = request.args.getlist("tag_ids")
         query = ConsoleDatasetListQuery.model_validate(query_params)
-        # provider = request.args.get("provider", default="vendor")
         if query.ids:
-            datasets, total = DatasetService.get_datasets_by_ids(query.ids, current_tenant_id)
+            datasets, total = DatasetService.get_datasets_by_ids(query.ids, current_tenant_id, query.provider)
         else:
             datasets, total = DatasetService.get_datasets(
                 query.page,
@@ -329,6 +343,7 @@ class DatasetListApi(Resource):
                 query.keyword,
                 query.tag_ids,
                 query.include_all,
+                query.provider,
             )
 
         # check embedding setting

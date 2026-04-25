@@ -41,26 +41,46 @@ const useKnowledgeDatasetSelection = ({
   const [rerankModelOpen, setRerankModelOpen] = useState(false)
 
   useEffect(() => {
+    let isActive = true
     void (async () => {
       const currentInputs = inputRef.current
       const datasetIds = currentInputs.dataset_ids
-      if (datasetIds.length > 0) {
-        const { data: dataSetsWithDetail } = await fetchDatasets({
-          url: '/datasets',
-          params: {
-            page: 1,
-            ids: datasetIds,
-          },
-        })
-        setSelectedDatasets(dataSetsWithDetail)
+      try {
+        if (datasetIds.length > 0) {
+          const { data: dataSetsWithDetail } = await fetchDatasets({
+            url: '/datasets',
+            params: {
+              page: 1,
+              ids: datasetIds,
+            },
+          })
+          if (!isActive)
+            return
+          setSelectedDatasets(dataSetsWithDetail)
+        }
+        else if (isActive) {
+          setSelectedDatasets([])
+        }
+      }
+      catch (error) {
+        if (!isActive)
+          return
+        console.error('加载知识库详情失败', error)
+        setSelectedDatasets([])
       }
 
       const nextInputs = produce(currentInputs, (draft) => {
         draft.dataset_ids = datasetIds
       })
-      setInputs(nextInputs)
-      setSelectedDatasetsLoaded(true)
+      if (isActive) {
+        setInputs(nextInputs)
+        setSelectedDatasetsLoaded(true)
+      }
     })()
+
+    return () => {
+      isActive = false
+    }
   }, [inputRef, setInputs])
 
   const handleOnDatasetsChange = useCallback((newDatasets: DataSet[]) => {

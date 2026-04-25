@@ -269,4 +269,27 @@ describe('use-knowledge-dataset-selection', () => {
     expect(result.current.rerankModelOpen).toBe(false)
     expect(result.current.showImageQueryVarSelector).toBe(true)
   })
+
+  it('marks datasets as loaded and clears selection when detail loading fails', async () => {
+    mockFetchDatasets.mockRejectedValueOnce(new Error('load failed'))
+    const { inputRef, setInputs } = createState(createPayload())
+
+    const { result } = renderHook(() => useKnowledgeDatasetSelection({
+      inputs: inputRef.current,
+      inputRef,
+      setInputs,
+      payloadRetrievalMode: RETRIEVE_TYPE.multiWay,
+      updateDatasetsDetail,
+      fallbackRerankModel: {},
+    }))
+
+    await waitFor(() => {
+      expect(result.current.selectedDatasetsLoaded).toBe(true)
+    })
+
+    expect(result.current.selectedDatasets).toEqual([])
+    expect(setInputs).toHaveBeenCalledWith(expect.objectContaining({
+      dataset_ids: ['dataset-1'],
+    }))
+  })
 })

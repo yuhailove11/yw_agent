@@ -96,6 +96,7 @@ class DatasetRetrievalTestDataFactory:
         created_by: str,
         name: str = "Test Dataset",
         permission: DatasetPermissionEnum = DatasetPermissionEnum.ONLY_ME,
+        provider: str = "vendor",
     ) -> Dataset:
         """Create a dataset."""
         dataset = Dataset(
@@ -106,7 +107,7 @@ class DatasetRetrievalTestDataFactory:
             indexing_technique=IndexTechniqueType.HIGH_QUALITY,
             created_by=created_by,
             permission=permission,
-            provider="vendor",
+            provider=provider,
             retrieval_model={"top_k": 2},
         )
         db_session_with_containers.add(dataset)
@@ -321,6 +322,38 @@ class TestDatasetServiceGetDatasets:
         # When tag_ids is empty, tag filtering is skipped, so normal query results are returned
         assert len(datasets) == 3
         assert total == 3
+
+    def test_get_datasets_with_provider_filter(self, db_session_with_containers: Session):
+        """Test get_datasets only returns datasets for the requested provider."""
+        account, tenant = DatasetRetrievalTestDataFactory.create_account_with_tenant(db_session_with_containers)
+
+        DatasetRetrievalTestDataFactory.create_dataset(
+            db_session_with_containers,
+            tenant_id=tenant.id,
+            created_by=account.id,
+            name="External Dataset",
+            permission=DatasetPermissionEnum.ALL_TEAM,
+            provider="external",
+        )
+        DatasetRetrievalTestDataFactory.create_dataset(
+            db_session_with_containers,
+            tenant_id=tenant.id,
+            created_by=account.id,
+            name="Vendor Dataset",
+            permission=DatasetPermissionEnum.ALL_TEAM,
+            provider="vendor",
+        )
+
+        datasets, total = DatasetService.get_datasets(
+            page=1,
+            per_page=20,
+            tenant_id=tenant.id,
+            provider="external",
+        )
+
+        assert len(datasets) == 1
+        assert total == 1
+        assert datasets[0].provider == "external"
 
     # ==================== Permission-Based Filtering Tests ====================
 

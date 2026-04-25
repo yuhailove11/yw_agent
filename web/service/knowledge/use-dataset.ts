@@ -37,6 +37,7 @@ const normalizeDatasetsParams = (params: Partial<FetchDatasetsParams['params']> 
     tag_ids,
     include_all,
     keyword,
+    provider,
   } = params
 
   return {
@@ -46,6 +47,7 @@ const normalizeDatasetsParams = (params: Partial<FetchDatasetsParams['params']> 
     ...(tag_ids?.length ? { tag_ids } : {}),
     ...(include_all !== undefined ? { include_all } : {}),
     ...(keyword ? { keyword } : {}),
+    ...(provider ? { provider } : {}),
   }
 }
 

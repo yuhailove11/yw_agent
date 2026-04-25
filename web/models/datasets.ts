@@ -195,6 +195,7 @@ export type FetchDatasetsParams = {
     limit?: number
     include_all?: boolean
     keyword?: string
+    provider?: string
   }
 }
 
