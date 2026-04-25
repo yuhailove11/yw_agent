@@ -138,10 +138,14 @@ describe('CustomEdge', () => {
     expect(screen.getByTestId('base-edge')).toHaveAttribute('data-opacity', '0.3')
     expect(screen.getByTestId('base-edge')).toHaveAttribute('data-dasharray', '8 8')
     expect(screen.getByTestId('block-selector')).toHaveTextContent('llm')
-    expect(screen.getByTestId('block-selector').parentElement).toHaveStyle({
+    const label = screen.getByTestId('block-selector').parentElement
+    expect(label).toHaveStyle({
       transform: 'translate(-50%, -50%) translate(24px, 48px)',
       opacity: '0.7',
+      pointerEvents: 'all',
     })
+    expect(label?.className).toContain('visible')
+    expect(label?.className).toContain('opacity-100')
 
     fireEvent.click(screen.getByTestId('block-selector'))
 
@@ -230,6 +234,50 @@ describe('CustomEdge', () => {
     )
 
     expect(screen.getByTestId('base-edge')).toHaveAttribute('data-stroke', 'var(--color-workflow-link-line-normal)')
-    expect(screen.getByTestId('block-selector')).toHaveAttribute('data-trigger-class', 'hover:scale-150 transition-all')
+    expect(screen.getByTestId('block-selector')).toHaveAttribute('data-trigger-class', 'transition-colors duration-150')
+    expect(screen.getByTestId('block-selector').parentElement).toHaveStyle({
+      pointerEvents: 'none',
+    })
+    expect(screen.getByTestId('block-selector').parentElement?.className).toContain('invisible')
+    expect(screen.getByTestId('block-selector').parentElement?.className).toContain('opacity-0')
+  })
+
+  it('should keep the insert trigger visible while hovering the edge label area', () => {
+    vi.useFakeTimers()
+
+    render(
+      <CustomEdge
+        id="edge-hover-label"
+        source="source-node"
+        target="target-node"
+        sourceX={0}
+        sourceY={0}
+        sourcePosition={Position.Right}
+        targetX={100}
+        targetY={100}
+        targetPosition={Position.Left}
+        selected={false}
+        data={{
+          sourceType: BlockEnum.Start,
+          targetType: BlockEnum.Code,
+          _hovering: false,
+        } as never}
+      />,
+    )
+
+    const label = screen.getByTestId('block-selector').parentElement as HTMLElement
+    fireEvent.mouseEnter(label)
+    expect(label.className).toContain('visible')
+    expect(label).toHaveStyle({ pointerEvents: 'all' })
+
+    fireEvent.mouseLeave(label)
+    vi.advanceTimersByTime(159)
+    expect(label.className).toContain('visible')
+
+    vi.advanceTimersByTime(1)
+    expect(label.className).toContain('invisible')
+    expect(label).toHaveStyle({ pointerEvents: 'none' })
+
+    vi.useRealTimers()
   })
 })

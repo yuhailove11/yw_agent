@@ -3,7 +3,11 @@ import type {
   OnEdgesChange,
 } from 'reactflow'
 import { produce } from 'immer'
-import { useCallback } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useRef,
+} from 'react'
 import {
   useStoreApi,
 } from 'reactflow'
@@ -26,6 +30,22 @@ export const useEdgesInteractions = () => {
   const { handleSyncWorkflowDraft } = useNodesSyncDraft()
   const { getNodesReadOnly } = useNodesReadOnly()
   const { saveStateToHistory } = useWorkflowHistory()
+  const edgeLeaveTimersRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
+
+  const clearEdgeLeaveTimer = useCallback((edgeId: string) => {
+    const timer = edgeLeaveTimersRef.current[edgeId]
+    if (timer) {
+      clearTimeout(timer)
+      delete edgeLeaveTimersRef.current[edgeId]
+    }
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      Object.values(edgeLeaveTimersRef.current).forEach(clearTimeout)
+      edgeLeaveTimersRef.current = {}
+    }
+  }, [])
 
   const deleteEdgeById = useCallback((edgeId: string) => {
     const {
@@ -56,23 +76,28 @@ export const useEdgesInteractions = () => {
     if (getNodesReadOnly())
       return
 
+    clearEdgeLeaveTimer(edge.id)
     const {
       edges,
       setEdges,
     } = store.getState()
     setEdges(updateEdgeHoverState(edges, edge.id, true))
-  }, [store, getNodesReadOnly])
+  }, [clearEdgeLeaveTimer, store, getNodesReadOnly])
 
   const handleEdgeLeave = useCallback<EdgeMouseHandler>((_, edge) => {
     if (getNodesReadOnly())
       return
 
-    const {
-      edges,
-      setEdges,
-    } = store.getState()
-    setEdges(updateEdgeHoverState(edges, edge.id, false))
-  }, [store, getNodesReadOnly])
+    clearEdgeLeaveTimer(edge.id)
+    edgeLeaveTimersRef.current[edge.id] = setTimeout(() => {
+      const {
+        edges,
+        setEdges,
+      } = store.getState()
+      setEdges(updateEdgeHoverState(edges, edge.id, false))
+      delete edgeLeaveTimersRef.current[edge.id]
+    }, 160)
+  }, [clearEdgeLeaveTimer, store, getNodesReadOnly])
 
   const handleEdgeDeleteByDeleteBranch = useCallback((nodeId: string, branchId: string) => {
     if (getNodesReadOnly())

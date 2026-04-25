@@ -125,10 +125,16 @@ describe('useEdgesInteractions', () => {
       result.current.handleEdgeLeave({} as never, result.current.edges[0] as never)
     })
 
+    expect(getEdgeRuntimeState(result.current.edges.find(edge => edge.id === 'e1'))._hovering).toBe(true)
+
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 180))
+    })
+
     await waitFor(() => {
       expect(getEdgeRuntimeState(result.current.edges.find(edge => edge.id === 'e1'))._hovering).toBe(false)
     })
-  })
+  }, 10000)
 
   it('handleEdgesChange should update edge.selected for select changes', async () => {
     const { result } = renderEdgesInteractions()

@@ -55,6 +55,7 @@ const CustomEdge = ({
     curvature: 0.16,
   })
   const [open, setOpen] = useState(false)
+  const [isLabelHovering, setIsLabelHovering] = useState(false)
   const { handleNodeAdd } = useNodesInteractions()
   const { availablePrevBlocks } = useAvailableBlocks((data as Edge['data'])!.targetType, (data as Edge['data'])?.isInIteration || (data as Edge['data'])?.isInLoop)
   const { availableNextBlocks } = useAvailableBlocks((data as Edge['data'])!.sourceType, (data as Edge['data'])?.isInIteration || (data as Edge['data'])?.isInLoop)
@@ -84,6 +85,14 @@ const CustomEdge = ({
     setOpen(v)
   }, [])
 
+  const handleLabelMouseEnter = useCallback(() => {
+    setIsLabelHovering(true)
+  }, [])
+
+  const handleLabelMouseLeave = useCallback(() => {
+    setIsLabelHovering(false)
+  }, [])
+
   const handleInsert = useCallback<OnSelectBlock>((nodeType, pluginDefaultValue) => {
     handleNodeAdd(
       {
@@ -111,6 +120,13 @@ const CustomEdge = ({
 
     return getEdgeColor()
   }, [data._connectedNodeIsHovering, linearGradientId, selected, sourceHandleId])
+
+  const isLabelVisible = open || !!data?._hovering || isLabelHovering
+  const labelZIndex = data.isInIteration
+    ? ITERATION_CHILDREN_Z_INDEX
+    : data.isInLoop
+      ? LOOP_CHILDREN_Z_INDEX
+      : undefined
 
   return (
     <>
@@ -142,17 +158,17 @@ const CustomEdge = ({
       <EdgeLabelRenderer>
         <div
           className={cn(
-            'nopan nodrag hover:scale-125',
-            data?._hovering ? 'block' : 'hidden',
-            open && 'block!',
-            data.isInIteration && `z-[${ITERATION_CHILDREN_Z_INDEX}]`,
-            data.isInLoop && `z-[${LOOP_CHILDREN_Z_INDEX}]`,
+            'nopan nodrag flex h-8 w-8 items-center justify-center rounded-full transition-opacity duration-150',
+            isLabelVisible ? 'visible opacity-100' : 'invisible opacity-0',
           )}
+          onMouseEnter={handleLabelMouseEnter}
+          onMouseLeave={handleLabelMouseLeave}
           style={{
             position: 'absolute',
             transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
-            pointerEvents: 'all',
+            pointerEvents: isLabelVisible ? 'all' : 'none',
             opacity: data._waitingRun ? 0.7 : 1,
+            zIndex: labelZIndex,
           }}
         >
           <BlockSelector
@@ -161,7 +177,7 @@ const CustomEdge = ({
             asChild
             onSelect={handleInsert}
             availableBlocksTypes={intersection(availablePrevBlocks, availableNextBlocks)}
-            triggerClassName={() => 'hover:scale-150 transition-all'}
+            triggerClassName={() => 'transition-colors duration-150'}
           />
         </div>
       </EdgeLabelRenderer>
